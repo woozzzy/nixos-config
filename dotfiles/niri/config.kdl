@@ -1,0 +1,185 @@
+include "./binds.kdl"
+spawn-at-startup "noctalia"
+
+input {
+    keyboard {
+        xkb {
+            layout "us"
+        }
+
+        numlock
+    }
+
+    touchpad {
+        // off
+        tap
+        // dwt
+        // dwtp
+        // drag false
+        // drag-lock
+        natural-scroll
+        // accel-speed 0.2
+        // accel-profile "flat"
+        // scroll-method "two-finger"
+        // disabled-on-external-mouse
+    }
+
+    mouse {
+        // off
+        // natural-scroll
+        accel-speed 0.1
+        accel-profile "flat"
+        // scroll-method "no-scroll"
+    }
+
+    trackpoint {
+        // off
+        // natural-scroll
+        // accel-speed 0.2
+        // accel-profile "flat"
+        // scroll-method "on-button-down"
+        // scroll-button 273
+        // scroll-button-lock
+        // middle-emulation
+    }
+
+    warp-mouse-to-focus
+    focus-follows-mouse max-scroll-amount="0%"
+}
+
+output "DP-2" {
+    mode "5120x1440@119.999"
+    scale 1.15
+    position x=0 y=0
+    
+    hot-corners {
+        off
+    }
+
+    layout {
+        default-column-width { proportion 0.25; }
+    }
+}
+
+output "DP-3" {
+    mode "5120x2160@165"
+    scale 1.15
+    position x=0 y=1253
+    focus-at-startup
+    
+    hot-corners {
+        off
+    }
+
+    layout {
+        default-column-width { proportion 0.33334; }
+    }
+}
+
+layout {
+    gaps 16
+
+    center-focused-column "never"
+    always-center-single-column
+
+    preset-column-widths {
+        proportion 0.25
+        proportion 0.33333
+        proportion 0.5
+        proportion 0.66667
+        proportion 0.75
+    }
+
+    preset-window-heights {
+        proportion 0.25
+        proportion 0.33333
+        proportion 0.5
+        proportion 0.66667
+        proportion 0.75
+    }
+
+    focus-ring {
+        width 2
+
+        active-color "#7fc8ff"
+
+        inactive-color "#505050"
+    }
+
+    border {
+        off
+    }
+
+    shadow {
+        on
+        draw-behind-window true
+        softness 30
+        spread 5
+        offset x=0 y=5
+        color "#0007"
+    }
+}
+
+
+hotkey-overlay {
+    skip-at-startup
+}
+
+prefer-no-csd
+
+screenshot-path "~/Pictures/Screenshots/Screenshot from %Y-%m-%d %H-%M-%S.png"
+
+animations {
+
+}
+
+window-rule {
+    match app-id=r#"zen$"# title="^Picture-in-Picture$"
+    open-floating true
+}
+
+window-rule {
+    geometry-corner-radius 20
+    clip-to-geometry true
+}
+
+// Noctalia
+window-rule {
+    match app-id="dev.noctalia.Noctalia"
+    open-floating true
+    default-column-width { fixed 1080; }
+    default-window-height { fixed 920; }
+}
+
+layer-rule {
+    match namespace="^noctalia-backdrop"
+    place-within-backdrop true
+}
+
+window-rule {
+    background-effect {
+        blur true
+        xray false
+    }
+}
+
+layer-rule {
+    match namespace="^noctalia-(bar-[^\"]+|notification|dock|panel|attached-panel|osd)$"
+    background-effect {
+        xray false
+    }
+}
+
+layer-rule {
+    match namespace="noctalia-window-switcher"
+    background-effect {
+        blur true
+        xray false
+    }
+}
+
+
+debug {
+    honor-xdg-activation-with-invalid-serial
+    wait-for-frame-completion-before-queueing
+}
