@@ -1,0 +1,12 @@
+[
+  // Toggle between the WYSIWYG markdown editor and raw source on the current file.
+  {
+    "key": "ctrl+shift+m",
+    "command": "workbench.action.reopenTextEditor",
+    "when": "activeEditor == 'workbench.editors.textResourceEditor' || resourceExtname == '.md'"
+  },
+  {
+    "key": "ctrl+alt+s",
+    "command": "workbench.action.files.saveFiles"
+  }
+]

@@ -1,5 +1,4 @@
 { self, inputs, ... }: {
-
     flake.nixosModules.woonixConfiguration = { pkgs, lib, ... }: {
         imports = [
             self.nixosModules.woonixHardware
@@ -13,6 +12,7 @@
             self.nixosModules.git
             self.nixosModules.neovim
             self.nixosModules.zsh
+            self.nixosModules.vscodium
         ];
 
         nix.settings.experimental-features = [
@@ -33,6 +33,7 @@
                         protocol: efi_chainload
                         image_path: uuid(c503124f-c625-4974-a02a-10edecdd72ae):/EFI/Microsoft/Boot/bootmgfw.efi
                 '';
+
             };
             timeout = 15;
         };
@@ -59,5 +60,4 @@
 
         system.stateVersion = "26.05";
     };
-
 }

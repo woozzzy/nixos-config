@@ -195,7 +195,7 @@ hl.window_rule({ name = "termiinal-widht", match = { class = "^kitty.*$" }, scro
 
 -- Persistent Worskapces per Monitor
 hl.workspace_rule({ workspace = "1", monitor = "DP-3", persistent = true, default = true })
-hl.workspace_rule({ workspace = "10", monitor = "DP-2", persistent = true, default = true })
+hl.workspace_rule({ workspace = "2", monitor = "DP-2", persistent = true, default = true })
 
 -- Binds
 require("binds")

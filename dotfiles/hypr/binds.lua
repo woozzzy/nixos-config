@@ -28,7 +28,6 @@ hl.bind(
 	exec(nc .. "panel-toggle kenn/keybind-cheatsheet:cheatsheet"),
 	{ description = "Keybind cheatsheet" }
 )
--- hl.bind(mainMod .. " + SHIFT + slash", exec(terminal .. " --hold hyprctl binds")) -- stand-in for niri's hotkey overlay
 hl.bind(
 	mainMod .. " + SHIFT + E",
 	exec(nc .. "panel-toggle session"),
@@ -58,8 +57,9 @@ hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true, descr
 --              + u/d : move window within the column, else to the workspace above/below (focus follows)
 --   Mod+Ctrl   + l/r : scroll the tape one column, focus stays
 --   Mod+Alt    + dir : focus monitor        Mod+Alt+Shift + dir : send window to monitor
--- Workspaces are a per-monitor vertical list ordered by id. Going "down" past the last
--- non-empty workspace creates a new one. Requires binds.window_direction_monitor_fallback = false.
+-- Each monitor is its own vertical list of workspaces ordered by id, growing downward from
+-- its anchor. Going "down" past the last non-empty workspace creates a new one (up to MAX_WS
+-- in total); up/down never leave the screen. Requires binds.window_direction_monitor_fallback = false.
 
 local dir_keys = {
 	left = { "left", "H" },
@@ -77,6 +77,17 @@ local function bind_dir(dir, mods, action, opts)
 	end
 end
 
+-- Anchors: one persistent workspace per monitor; everything else is created on the
+-- focused monitor when first targeted and removed when left empty.
+local stack = {
+	["DP-3"] = { anchor = 1 },
+	["DP-2"] = { anchor = 2 },
+}
+local MAX_WS = 10 -- total across both screens, so Mod+1–0 can always reach every workspace
+for name, cfg in pairs(stack) do
+	hl.workspace_rule({ workspace = tostring(cfg.anchor), monitor = name, persistent = true, default = true })
+end
+
 -- Ids of the workspaces on a monitor, ascending (specials excluded).
 local function monitor_workspaces(mon_name)
 	local ids = {}
@@ -89,52 +100,27 @@ local function monitor_workspaces(mon_name)
 	return ids
 end
 
--- One vertical stack across both screens, ids 1–10. Ids ascend top-to-bottom on each
--- monitor (Hyprland picks the slide direction from id order). DP-3 grows downward from
--- workspace 1 (2, 3 … 5); DP-2 grows upward from workspace 10 (9, 8 … 6). Stepping past
--- an anchor crosses to the other screen's anchor. Only the anchors persist.
-local stack = {
-	["DP-3"] = { anchor = 1, range = { 1, 5 }, grows = "down", beyond = { up = "DP-2" } },
-	["DP-2"] = { anchor = 10, range = { 6, 10 }, grows = "up", beyond = { down = "DP-3" } },
-}
-for name, cfg in pairs(stack) do
-	for id = cfg.range[1], cfg.range[2] do
-		hl.workspace_rule({
-			workspace = tostring(id),
-			monitor = name,
-			persistent = (id == cfg.anchor),
-			default = (id == cfg.anchor),
-		})
-	end
-end
-
--- An unused id on the growing side of this monitor's stack (nil if none is possible).
+-- Lowest unused id above this monitor's last workspace (nil once MAX_WS is reached).
 local function fresh_workspace_id(mon_name)
-	local cfg, used = stack[mon_name], {}
+	local used = {}
 	for _, ws in ipairs(hl.get_workspaces()) do
 		if not ws.special then
 			used[ws.id] = true
 		end
 	end
 	local ids = monitor_workspaces(mon_name)
-	local step = (cfg.grows == "down") and 1 or -1
-	local id = (step == 1) and ids[#ids] or ids[1]
+	local id = ids[#ids]
 	repeat
-		id = id + step
-	until not used[id] or id < cfg.range[1] or id > cfg.range[2]
-	return (id >= cfg.range[1] and id <= cfg.range[2]) and id or nil
+		id = id + 1
+	until not used[id] or id > MAX_WS
+	return (id <= MAX_WS) and id or nil
 end
 
--- Workspace above/below the active one. "up" = lower id, "down" = higher id on both screens.
--- Past the growing end: a fresh workspace (if the current one isn't empty).
--- Past the anchor: the neighbouring screen's anchor. nil = nothing to do.
+-- Workspace above/below the active one on this monitor: "up" = lower id, "down" = higher id.
+-- Past the bottom: a fresh workspace (if the current one isn't empty). Past the top: nothing.
 local function workspace_in_direction(dir)
 	local mon, ws = hl.get_active_monitor(), hl.get_active_workspace()
-	if not mon or not ws then
-		return nil
-	end
-	local cfg = stack[mon.name]
-	if not cfg then
+	if not mon or not ws or not stack[mon.name] then
 		return nil
 	end
 	local best = nil
@@ -149,11 +135,10 @@ local function workspace_in_direction(dir)
 	if best then
 		return best
 	end
-	if dir == cfg.grows then
-		return (ws.windows > 0) and fresh_workspace_id(mon.name) or nil
+	if dir == "down" and ws.windows > 0 then
+		return fresh_workspace_id(mon.name)
 	end
-	local other = cfg.beyond[dir]
-	return other and stack[other].anchor or nil
+	return nil
 end
 
 -- Is there a tiled window above/below the active one in the same column? (same left edge)
@@ -233,8 +218,8 @@ bind_dir(
 )
 
 -- 6. Workspaces
--- Mod+N focuses workspace id N (key 0 = 10); with the stack above, 1–5 live on DP-3 and 6–10 on DP-2.
--- Mod+Shift+N moves the window there and follows it.
+-- Mod+N focuses workspace id N (key 0 = 10) wherever it lives, creating it on the focused
+-- screen if it doesn't exist yet. Mod+Shift+N moves the window there and follows it.
 for i = 1, 10 do
 	local key = i % 10 -- 10 -> key 0
 	hl.bind(mainMod .. " + " .. key, hl.dsp.focus({ workspace = i }), { description = "Focus workspace " .. i })
@@ -257,6 +242,7 @@ hl.bind(
 )
 
 -- 7. Monitors
+-- The only way a window or focus crosses screens.
 for _, d in ipairs({ { "left", "left" }, { "right", "right" }, { "up", "above" }, { "down", "below" } }) do
 	local dir, where = d[1], d[2]
 	bind_dir(dir, "ALT", hl.dsp.focus({ monitor = dir }), { description = "Focus monitor " .. where })

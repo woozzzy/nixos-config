@@ -1,5 +1,4 @@
 { self, inputs, ... }: {
-
     flake.nixosModules.core = { pkgs, ... }: {
         nixpkgs.config.allowUnfree = true;
         networking.networkmanager.enable = true;
@@ -18,21 +17,11 @@
             eza
             bat
             yazi
+            tmux
             inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.default
             obsidian
+            sbctl
         ];
-
-        # Neovim
-        # programs.neovim = {
-        #     enable = true;
-        #     defaultEditor = true;
-        #     viAlias = true;
-        #     vimAlias = true;
-        #     configure.customRC = ''
-        #         set tabstop=4 shiftwidth=4 expandtab
-        #         set number
-        #     '';
-        # };
 
         # Audio
         security.rtkit.enable = true;

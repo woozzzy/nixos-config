@@ -1,0 +1,90 @@
+{
+  // ---------- Markdown ----------
+  // Hybrid WYSIWYG editor (VS Code 1.131+, view type "vscode.markdown.editor").
+  // Still marked experimental upstream. Use "View: Reopen Editor With..." to
+  // drop back to the plain text editor on any given file.
+  "workbench.editorAssociations": {
+    "*.md": "vscode.markdown.editor"
+  },
+  "workbench.editor.markdownDefaultEditorInAgentsWindow": true,
+  "[markdown]": {
+    "editor.wordWrap": "on",
+    "editor.quickSuggestions": {
+      "comments": "off",
+      "strings": "off",
+      "other": "off"
+    },
+    "editor.defaultFormatter": "yzhang.markdown-all-in-one"
+  },
+  "markdown.extension.toc.updateOnSave": true,
+  "markdown.extension.italic.indicator": "_",
+  // ---------- Nix ----------
+  "nix.enableLanguageServer": true,
+  "nix.serverPath": "nixd",
+  "nix.formatterPath": "nixfmt",
+  "nix.serverSettings": {
+    "nixd": {
+      "diagnostic": {
+        "suppress": [
+          "sema-unused-def-lambda-noarg-formal"
+        ]
+      },
+      "formatting": {
+        "command": [
+          "nixfmt"
+        ]
+      },
+      "options": {
+        "nixos": {
+          "expr": "(builtins.getFlake \"/home/woozy/nixos-config\").nixosConfigurations.woonix.options"
+        }
+      }
+    }
+  },
+  "[nix]": {
+    "editor.tabSize": 4,
+    "editor.defaultFormatter": "jnoortheen.nix-ide"
+  },
+  // ---------- Lua (hyprland.lua, binds.lua, nvim config) ----------
+  // Per-directory .luarc.json is picked up automatically — dotfiles/hypr/.luarc.json
+  // already points lua-language-server at /run/current-system/sw/share/hypr/stubs.
+  "Lua.workspace.checkThirdParty": false,
+  "Lua.telemetry.enable": false,
+  "Lua.format.defaultConfig": {
+    "indent_style": "space",
+    "indent_size": "2"
+  },
+  "[lua]": {
+    "editor.tabSize": 2,
+    "editor.defaultFormatter": "sumneko.lua"
+  },
+  // ---------- Hyprland / niri ----------
+  "files.associations": {
+    "*.kdl": "kdl",
+    "hyprland.conf": "ini",
+    "*.rasi": "css"
+  },
+  // ---------- Editor ----------
+  "editor.fontFamily": "'Hack Nerd Font', monospace",
+  "editor.fontLigatures": true,
+  "editor.fontSize": 14,
+  "editor.formatOnSave": true,
+  "editor.renderWhitespace": "trailing",
+  "editor.bracketPairColorization.enabled": true,
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "workbench.colorTheme": "Dark Modern",
+  "window.titleBarStyle": "custom",
+  "terminal.integrated.defaultProfile.linux": "zsh",
+  "terminal.integrated.fontFamily": "'Hack Nerd Font'",
+  // ---------- Neovim backend ----------
+  "extensions.experimental.affinity": {
+    "asvetliakov.vscode-neovim": 1
+  },
+  "vscode-neovim.neovimExecutablePaths.linux": "/run/current-system/sw/bin/nvim",
+  // ---------- Housekeeping ----------
+  "update.mode": "none",
+  "extensions.autoUpdate": "off",
+  "telemetry.telemetryLevel": "off",
+  "git.autofetch": true
+}
