@@ -1,0 +1,18 @@
+{
+  "workspace": {
+    "library": [
+      "/run/current-system/sw/share/hypr/stubs",
+      "/run/current-system/sw/share/nvim/runtime/lua"
+    ],
+    "checkThirdParty": false
+  },
+  "diagnostics": {
+    "globals": [
+      "hl",
+      "vim"
+    ]
+  },
+  "runtime": {
+    "version": "LuaJIT"
+  }
+}
