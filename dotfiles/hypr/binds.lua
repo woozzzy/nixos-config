@@ -18,6 +18,32 @@ local function bind_dir(dir, mods, action, opts)
 	end
 end
 
+-- Is there a tiled window above/below `w` in its column (same left edge)?
+local function in_column(w, dir)
+	if w.floating then
+		return false
+	end
+	for _, o in ipairs(hl.get_workspace_windows(w.workspace)) do
+		if not o.floating and o.at.x == w.at.x and ((dir == "up" and o.at.y < w.at.y) or (dir == "down" and o.at.y > w.at.y)) then
+			return true
+		end
+	end
+	return false
+end
+
+-- Focus (or move the window) within the column; at the end of the column, go to workspace `ws` instead.
+local WS_ABOVE, WS_BELOW = "m-1", "r+1" -- r+1 also creates a fresh workspace past the last one
+local function column_then_workspace(dir, ws, move)
+	return function()
+		local w = hl.get_active_window()
+		if w and in_column(w, dir) then
+			hl.dispatch(move and hl.dsp.window.move({ direction = dir }) or hl.dsp.focus({ direction = dir }))
+		else
+			hl.dispatch(move and hl.dsp.window.move({ workspace = ws, follow = true }) or hl.dsp.focus({ workspace = ws }))
+		end
+	end
+end
+
 -- One persistent workspace per monitor (DP-2 above DP-3); the rest are created on demand.
 hl.workspace_rule({ workspace = "1", monitor = "DP-3", persistent = true, default = true })
 hl.workspace_rule({ workspace = "2", monitor = "DP-2", persistent = true, default = true })
@@ -41,6 +67,7 @@ hl.bind(
 hl.bind(mainMod .. " + SHIFT + E", exec(nc .. "panel-toggle session"), { description = "Session menu" })
 hl.bind(mainMod .. " + Escape", exec(nc .. "session lock"), { description = "Lock screen" })
 hl.bind(mainMod .. " + CTRL + SHIFT + M", hl.dsp.exit(), { description = "Exit Hyprland" })
+hl.bind(mainMod .. " + O", hl.plugin.scrolloverview.overview("toggle"), { description = "Workspace overview" })
 
 -- 3. Window management
 hl.bind(mainMod .. " + Q", hl.dsp.window.close(), { description = "Close window" })
@@ -52,20 +79,20 @@ hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(), { mouse = true, descrip
 hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true, description = "Resize window" })
 
 -- 4. Navigation
--- Left/right walk the columns. Up/down walk the column, then fall through to the monitor above/below.
+-- Left/right walk the columns. Up/down walk the column, then the workspaces on this monitor.
 bind_dir("left", "", hl.dsp.layout("focus l"), { description = "Focus column left" })
 bind_dir("right", "", hl.dsp.layout("focus r"), { description = "Focus column right" })
-bind_dir("up", "", hl.dsp.focus({ direction = "up" }), { description = "Focus up (window, then monitor)" })
-bind_dir("down", "", hl.dsp.focus({ direction = "down" }), { description = "Focus down (window, then monitor)" })
+bind_dir("up", "", column_then_workspace("up", WS_ABOVE), { description = "Focus up (window, then workspace)" })
+bind_dir("down", "", column_then_workspace("down", WS_BELOW), { description = "Focus down (window, then workspace)" })
 hl.bind("ALT + Tab", exec(nc .. "window-switcher"), { description = "Window switcher" })
 
 -- 5. Moving windows
 bind_dir("left", "SHIFT", hl.dsp.layout("swapcol l"), { description = "Swap column left" })
 bind_dir("right", "SHIFT", hl.dsp.layout("swapcol r"), { description = "Swap column right" })
-bind_dir("up", "SHIFT", hl.dsp.window.move({ direction = "up" }),
-	{ description = "Move window up (column, then monitor)" })
-bind_dir("down", "SHIFT", hl.dsp.window.move({ direction = "down" }),
-	{ description = "Move window down (column, then monitor)" })
+bind_dir("up", "SHIFT", column_then_workspace("up", WS_ABOVE, true),
+	{ description = "Move window up (column, then workspace)" })
+bind_dir("down", "SHIFT", column_then_workspace("down", WS_BELOW, true),
+	{ description = "Move window down (column, then workspace)" })
 
 -- 6. Workspaces
 for i = 1, 10 do
@@ -77,12 +104,8 @@ for i = 1, 10 do
 		{ description = "Move window to workspace " .. i }
 	)
 end
-bind_dir("left", "CTRL", hl.dsp.focus({ workspace = "m-1" }), { description = "Previous workspace on this monitor" })
-bind_dir("right", "CTRL", hl.dsp.focus({ workspace = "m+1" }), { description = "Next workspace on this monitor" })
-hl.bind(mainMod .. " + mouse_up", hl.dsp.focus({ workspace = "m-1" }),
-	{ description = "Previous workspace on this monitor" })
-hl.bind(mainMod .. " + mouse_down", hl.dsp.focus({ workspace = "m+1" }),
-	{ description = "Next workspace on this monitor" })
+hl.bind(mainMod .. " + mouse_up", hl.dsp.focus({ workspace = WS_ABOVE }), { description = "Focus workspace above" })
+hl.bind(mainMod .. " + mouse_down", hl.dsp.focus({ workspace = WS_BELOW }), { description = "Focus workspace below" })
 hl.bind(mainMod .. " + grave", hl.dsp.workspace.toggle_special("scratch"), { description = "Toggle scratchpad" })
 hl.bind(
 	mainMod .. " + SHIFT + grave",

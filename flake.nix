@@ -5,11 +5,15 @@
     import-tree.url = "github:vic/import-tree";
     wrapper-modules.url = "github:BirdeeHub/nix-wrapper-modules";
     zen-browser = {
-        url = "github:youwen5/zen-browser-flake";
-        inputs.nixpkgs.follows = "nixpkgs";
+      url = "github:youwen5/zen-browser-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     noctalia.url = "github:noctalia-dev/noctalia";
+    hyprland-scroll-overview = {
+      url = "github:yayuuu/hyprland-scroll-overview";
+      flake = false;
+    };
   };
 
-  outputs = inputs: inputs.flake-parts.lib.mkFlake {inherit inputs;} (inputs.import-tree ./modules);
+  outputs = inputs: inputs.flake-parts.lib.mkFlake { inherit inputs; } (inputs.import-tree ./modules);
 }

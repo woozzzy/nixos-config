@@ -2,7 +2,7 @@ return {
     {
         "stevearc/conform.nvim",
         opts = {
-            formatters = { nixfmt = { args = { "--indent", "4" } } },
+            formatters = { nixfmt = { args = { "--indent", "2" } } },
             formatters_by_ft = { nix = { "nixfmt" } },
         },
     },

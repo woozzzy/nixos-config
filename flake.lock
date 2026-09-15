@@ -18,6 +18,22 @@
         "type": "github"
       }
     },
+    "hyprland-scroll-overview": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1788745613,
+        "narHash": "sha256-clDeTM5itsJPvqpbEkbWUmuPROsz2+YUnTpqsjQDMqU=",
+        "owner": "yayuuu",
+        "repo": "hyprland-scroll-overview",
+        "rev": "5e96ae20ec73c320248bcf3ff68b330bc1ed4152",
+        "type": "github"
+      },
+      "original": {
+        "owner": "yayuuu",
+        "repo": "hyprland-scroll-overview",
+        "type": "github"
+      }
+    },
     "import-tree": {
       "locked": {
         "lastModified": 1788275959,
@@ -114,6 +130,7 @@
     "root": {
       "inputs": {
         "flake-parts": "flake-parts",
+        "hyprland-scroll-overview": "hyprland-scroll-overview",
         "import-tree": "import-tree",
         "nixpkgs": "nixpkgs",
         "noctalia": "noctalia",

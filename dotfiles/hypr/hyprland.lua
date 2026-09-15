@@ -1,3 +1,4 @@
+hl.plugin.load("/etc/hypr/plugins/libscrolloverview.so")
 ------------------------------------------------------------------------------
 -- 1. Programs (plain Lua locals; referenced below)
 ------------------------------------------------------------------------------
@@ -29,12 +30,12 @@ hl.env("XCURSOR_THEME", "macOS")
 hl.env("XCURSOR_SIZE", "24") -- [default] as in the example config
 hl.env("HYPRCURSOR_SIZE", "24")
 
-hl.env("LIBVA_DRIVER_NAME", "nvidia") -- [nvidia] VA-API through the NVIDIA driver
-hl.env("__GLX_VENDOR_LIBRARY_NAME", "nvidia") -- [nvidia] GLX → NVIDIA's libGL
+hl.env("LIBVA_DRIVER_NAME", "nvidia")          -- [nvidia] VA-API through the NVIDIA driver
+hl.env("__GLX_VENDOR_LIBRARY_NAME", "nvidia")  -- [nvidia] GLX → NVIDIA's libGL
 hl.env("ELECTRON_OZONE_PLATFORM_HINT", "auto") -- [nvidia] Electron picks Wayland; NIXOS_OZONE_WL=1 is set Nix-side too
 
-hl.env("GDK_BACKEND", "wayland,x11,*") -- GTK: Wayland first, X11 fallback   (env-vars page)
-hl.env("QT_QPA_PLATFORM", "wayland;xcb") -- Qt:  Wayland first, X11 fallback   (env-vars page)
+hl.env("GDK_BACKEND", "wayland,x11,*")         -- GTK: Wayland first, X11 fallback   (env-vars page)
+hl.env("QT_QPA_PLATFORM", "wayland;xcb")       -- Qt:  Wayland first, X11 fallback   (env-vars page)
 -- hl.env("SDL_VIDEODRIVER", "wayland")      -- env-vars page warns: breaks games bundling old SDL. Leave unset here.
 
 ------------------------------------------------------------------------------
@@ -44,10 +45,10 @@ hl.env("QT_QPA_PLATFORM", "wayland;xcb") -- Qt:  Wayland first, X11 fallback   (
 ------------------------------------------------------------------------------
 hl.config({
 	general = {
-		layout = "scrolling", -- [choice] default "dwindle"
-		gaps_in = 5, -- [noctalia]
-		gaps_out = 10, -- [noctalia]
-		border_size = 2, -- [choice] default 1
+		layout = "scrolling",  -- [choice] default "dwindle"
+		gaps_in = 5,           -- [noctalia]
+		gaps_out = 10,         -- [noctalia]
+		border_size = 2,       -- [choice] default 1
 		resize_on_border = true, -- [choice] default false — drag window edges/gaps to resize
 		allow_tearing = false, -- [default] read Configuring → Tearing before enabling for games
 	},
@@ -55,29 +56,29 @@ hl.config({
 	-- Scrolling layout: windows sit on an endless horizontal tape of columns;
 	-- the monitor is a viewport that scrolls along it. (Scrolling-Layout page)
 	scrolling = {
-		column_width = 0.5, -- [default] width of a new column, fraction of monitor
+		column_width = 0.5,                                          -- [default] width of a new column, fraction of monitor
 		explicit_column_widths = "0.25, 0.333, 0.5, 0.667, 0.75, 1.0", -- [default] presets cycled by `colresize +conf/-conf`
-		fullscreen_on_one_column = false, -- [choice] default true: a lone column spans the screen. false = niri behaviour
-		focus_fit_method = 1, -- [default] 0 = center the focused column, 1 = scroll just enough to fit
-		follow_focus = true, -- [default] viewport follows keyboard focus
-		follow_min_visible = 0.4, -- [default] …only if at least 40% of the window is already visible
-		wrap_focus = true, -- [choice] default true wraps `focus l/r` at the ends; false = niri behaviour
-		wrap_swapcol = true, -- [default]
-		direction = "right", -- [default] new columns open to the right
+		fullscreen_on_one_column = false,                            -- [choice] default true: a lone column spans the screen. false = niri behaviour
+		focus_fit_method = 1,                                        -- [default] 0 = center the focused column, 1 = scroll just enough to fit
+		follow_focus = true,                                         -- [default] viewport follows keyboard focus
+		follow_min_visible = 0.4,                                    -- [default] …only if at least 40% of the window is already visible
+		wrap_focus = true,                                           -- [choice] default true wraps `focus l/r` at the ends; false = niri behaviour
+		wrap_swapcol = true,                                         -- [default]
+		direction = "right",                                         -- [default] new columns open to the right
 	},
 
 	decoration = {
-		rounding = 12, -- [choice] Noctalia suggests 20, example uses 10
-		rounding_power = 2, -- [default]
-		active_opacity = 1.0, -- [default]
-		inactive_opacity = 1.0, -- [default]
+		rounding = 12,                                                                -- [choice] Noctalia suggests 20, example uses 10
+		rounding_power = 2,                                                           -- [default]
+		active_opacity = 1.0,                                                         -- [default]
+		inactive_opacity = 1.0,                                                       -- [default]
 		shadow = { enabled = true, range = 4, render_power = 3, color = "0xee1a1a1a" }, -- [noctalia]
 		-- blur = { enabled = true, size = 3, passes = 2, vibrancy = 0.1696 }, -- [noctalia] passes=2 is for its panels
 		blur = {
 			enabled = true,
-			size = 8, -- default 8, Noctalia's suggestion 3 — the main "how frosted" knob
-			passes = 3, -- default 1; bigger size needs more passes or it looks blocky (Blur table note)
-			noise = 0.02, -- default 0.0117; a little grain reads as glass
+			size = 8,      -- default 8, Noctalia's suggestion 3 — the main "how frosted" knob
+			passes = 3,    -- default 1; bigger size needs more passes or it looks blocky (Blur table note)
+			noise = 0.02,  -- default 0.0117; a little grain reads as glass
 			contrast = 1.0, -- default 0.8916
 			brightness = 1.0, -- default 1; slightly darker glass
 			vibrancy = 0.25, -- default 0.1696; saturates what's behind
@@ -85,21 +86,21 @@ hl.config({
 		},
 	},
 
-	animations = { enabled = true }, -- [default]; per-element animations are set below
+	animations = { enabled = true },       -- [default]; per-element animations are set below
 
-	input = { -- (Config options → Input)
-		kb_layout = "us", -- [default]
-		kb_options = "", -- e.g. "caps:swapescape" (Binds page → XKB options)
-		follow_mouse = 1, -- [default] hovering focuses
-		sensitivity = 0, -- [default] -1.0 … 1.0
-		accel_profile = "flat", -- [choice] default "" (libinput adaptive); flat = no pointer acceleration
+	input = {                              -- (Config options → Input)
+		kb_layout = "us",                    -- [default]
+		kb_options = "",                     -- e.g. "caps:swapescape" (Binds page → XKB options)
+		follow_mouse = 1,                    -- [default] hovering focuses
+		sensitivity = 0,                     -- [default] -1.0 … 1.0
+		accel_profile = "flat",              -- [choice] default "" (libinput adaptive); flat = no pointer acceleration
 		touchpad = { natural_scroll = false }, -- [default]
 	},
 
-	misc = { -- (Config options → Misc)
+	misc = {                      -- (Config options → Misc)
 		disable_hyprland_logo = true, -- [choice] default false; Noctalia draws the wallpaper
 		force_default_wallpaper = 0, -- [choice] default -1 (random); 0 = no anime mascots
-		focus_on_activate = true, -- [choice] default false; apps asking for focus (e.g. a browser opened from a link) get it
+		focus_on_activate = true,   -- [choice] default false; apps asking for focus (e.g. a browser opened from a link) get it
 		-- vrr = 2,                       -- default 0; 2 = adaptive sync in fullscreen only. Set once the monitor is known
 	},
 
@@ -113,6 +114,14 @@ hl.config({
 	xwayland = { force_zero_scaling = true }, -- [choice] default false; the documented fix for blurry XWayland on scaled outputs (XWayland page)
 
 	binds = { window_direction_monitor_fallback = false },
+
+	plugin = {
+		scrolloverview = {
+			layout = "vertical", -- matches the per-monitor vertical stacks
+			scale = 0.5,
+			workspace_gap = 40,
+		},
+	},
 })
 
 -- Animations (0.56.x: spring key is `dampening`; git main calls it `damping` — check your version's example)
@@ -192,10 +201,6 @@ hl.window_rule({
 -- Scrolling: per-app starting column width (Scrolling-Layout page → Window rules)
 hl.window_rule({ name = "browser-width", match = { class = "^zen.*$" }, scrolling_width = 0.667 })
 hl.window_rule({ name = "termiinal-widht", match = { class = "^kitty.*$" }, scrolling_width = 0.333 })
-
--- Persistent Worskapces per Monitor
-hl.workspace_rule({ workspace = "1", monitor = "DP-3", persistent = true, default = true })
-hl.workspace_rule({ workspace = "2", monitor = "DP-2", persistent = true, default = true })
 
 -- Binds
 require("binds")
