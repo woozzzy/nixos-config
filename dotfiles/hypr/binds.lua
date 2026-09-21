@@ -1,7 +1,3 @@
--- Keybind cheatsheet (kenn/keybind-cheatsheet) reads this file:
--- a category is a comment line `-- <n>. <Name>`; each bind's `description = "..."`
--- must be a string literal on that line ("Prefix " .. i is fine).
-
 local terminal = "kitty"
 local browser = "zen"
 local mainMod = "SUPER"

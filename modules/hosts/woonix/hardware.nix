@@ -30,7 +30,6 @@
       boot.kernelParams = [
         "nvidia-drm.fbdev=1"
         "video=DP-3:5120x2160@165"
-        "video=DP-2:d"
       ];
 
       fileSystems."/" = {
