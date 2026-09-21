@@ -34,7 +34,7 @@ find_root() {
     git rev-parse --show-toplevel 2>/dev/null || echo "$PWD"
 }
 
-name= instance=default root=${JAIL_ROOT:-} temp=0 ssh=0 gpu=0
+name='' instance=default root=${JAIL_ROOT:-} temp=0 ssh=0 gpu=0
 pass=()
 # shellcheck disable=SC2206
 [[ -n ${JAIL_ENV:-} ]] && pass+=($JAIL_ENV)
